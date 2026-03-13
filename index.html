@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novruz Tarot Konsepti</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Playfair Display', 'Georgia', serif; 
+            user-select: none;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+            background-color: #000;
+        }
+
+        /* Arxa Planlar */
+        .day { width: 50%; height: 100%; background: linear-gradient(180deg, #4da8da 0%, #87CEEB 40%, #e0f6ff 100%); position: relative; overflow: hidden; }
+        .night { width: 50%; height: 100%; background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); position: relative; overflow: hidden; }
+
+        /* Buludlar */
+        .cloud { position: absolute; background: #fff; border-radius: 50px; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.1); opacity: 0.9; }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+        .cloud1 { width: 150px; height: 50px; top: 15%; left: 10%; }
+        .cloud1::before { width: 70px; height: 70px; top: -35px; left: 20px; }
+        .cloud1::after { width: 90px; height: 90px; top: -45px; right: 15px; }
+        .cloud2 { width: 200px; height: 60px; top: 30%; left: 60%; transform: scale(0.8); }
+        .cloud2::before { width: 80px; height: 80px; top: -40px; left: 30px; }
+        .cloud2::after { width: 100px; height: 100px; top: -50px; right: 25px; }
+
+        /* Ulduzlar */
+        .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.8); animation: twinkle 2s infinite ease-in-out alternate; }
+        @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+
+        /* MİSTİK TAROT PLATFORMASI */
+        .tarot-platform { position: absolute; bottom: 0; left: 0; width: 100%; height: 45vh; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 40px; z-index: 10; }
+        .tarot-platform::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(5, 10, 15, 0.95) 10%, rgba(15, 25, 40, 0.5) 60%, transparent 100%); z-index: -1; pointer-events: none; }
+        .tarot-platform::after { content: ''; position: absolute; top: 30%; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3), transparent); z-index: -1; }
+
+        /* BLUR EKRAN (Problemi həll edən əsas məqamlar z-indexlərdədir) */
+        .blur-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        .blur-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* HİSSƏCİKLƏR (PARTICLES) ÜÇÜN KONTEYNER VƏ STİLLƏR */
+        #particle-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; }
+        .particle { position: absolute; opacity: 0; pointer-events: none; }
+
+        .particle.water { border-radius: 50%; border: 1px solid rgba(150, 220, 255, 0.8); background: rgba(100, 200, 255, 0.2); animation: float-bubble 2s ease-in forwards; }
+        @keyframes float-bubble { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; } }
+
+        .particle.fire { width: 4px; height: 4px; background: #ff9900; border-radius: 50%; box-shadow: 0 0 10px #ff3300, 0 0 20px #ff0000; animation: spark-fly 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes spark-fly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+
+        .particle.wind { height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent); border-radius: 50%; filter: blur(1px); animation: wind-dash 1s linear forwards; }
+        @keyframes wind-dash { 0% { transform: translate(0, 0) rotate(var(--rot)) scaleX(0.5); opacity: 0; } 20% { opacity: 0.6; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scaleX(2.5); opacity: 0; } }
+
+        .particle.earth { width: 3px; height: 3px; background: #ffd700; border-radius: 50%; box-shadow: 0 0 8px #ffaa00; animation: earth-dust 2.5s ease-in-out forwards; }
+        @keyframes earth-dust { 0% { transform: translate(0, 0) scale(0); opacity: 0; } 20% { opacity: 1; transform: translate(0, 0) scale(1.2); } 80% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+
+        /* TAROT KARTLARI */
+        /* DIQQƏT: z-index silindi ki, aktiv kart bluru dələ bilsin */
+        .cards-container { display: flex; justify-content: center; gap: 30px; position: relative; } 
+        
+        .card-wrapper { width: 160px; height: 270px; perspective: 1200px; position: relative; z-index: 1; transition: z-index 0s 0.6s; }
+        .card-wrapper.active { z-index: 100; transition: z-index 0s; }
+
+        .tarot-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(145deg, #161c27, #0b0e14); border: 2px solid #b89146; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(184, 145, 70, 0.15); display: flex; flex-direction: column; align-items: center; color: #dcb662; transition: all 0.4s ease; }
+        .card-face::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(220, 182, 98, 0.4); border-radius: 6px; pointer-events: none; }
+        
+        .card-front { justify-content: space-between; padding: 25px 15px; }
+        .card-back { transform: rotateY(180deg); justify-content: center; padding: 20px; text-align: center; background: linear-gradient(145deg, #0b0e14, #1a2233); }
+        .card-back h3 { font-size: 18px; color: #ffd700; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; }
+        .card-back p { font-size: 13px; line-height: 1.6; color: #e0cca0; }
+
+        .card-wrapper:not(.active) .tarot-card:hover { transform: translateY(-20px) rotateY(10deg); }
+        .card-wrapper:not(.active) .tarot-card:hover .card-face { border-color: #ffd700; box-shadow: -10px 25px 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(220, 182, 98, 0.3); }
+        .card-wrapper:not(.active) .tarot-card:hover .card-symbol svg { stroke: #ffd700; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
+        
+        .card-wrapper.active .card-face { box-shadow: 0 0 50px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(220, 182, 98, 0.3); border-color: #ffd700; }
+
+        .roman-numeral { font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+        .card-symbol { width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; }
+        .card-symbol svg { width: 100%; height: 100%; fill: none; stroke: #b89146; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: all 0.4s ease; }
+        .card-title { font-size: 16px; font-weight: bold; text-align: center; letter-spacing: 1.5px; text-transform: uppercase; line-height: 1.4; }
+
+        /* 3D KƏPƏNƏKLƏR */
+        .bug-container { position: absolute; z-index: 5; pointer-events: none; will-change: transform; }
+        .butterfly-3d { position: relative; width: 36px; height: 30px; transform-style: preserve-3d; transform: rotateX(50deg) rotateZ(90deg) scale(0.8); }
+        .wing { position: absolute; top: 0; width: 18px; height: 28px; background-color: #000; border: 1.5px solid #000; transition: all 0.5s ease; }
+        
+        .is-orange .wing { background-image: radial-gradient(circle at 40% 30%, #ff6600 20%, transparent 35%), radial-gradient(circle at 60% 60%, #ff9900 15%, transparent 30%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 0 4px #000; }
+        .is-blue .wing { background-image: radial-gradient(circle at 40% 30%, #00aaff 20%, transparent 35%), radial-gradient(circle at 60% 60%, #00ffff 15%, transparent 30%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 0 4px #000, 0 0 15px rgba(0, 170, 255, 0.8); }
+        
+        .wing-left { left: 0; border-radius: 20% 100% 10% 80%; transform-origin: right center; animation: flap-left 0.1s infinite alternate cubic-bezier(0.4, 0, 0.6, 1); }
+        .wing-right { left: 18px; border-radius: 100% 20% 80% 10%; transform-origin: left center; animation: flap-right 0.1s infinite alternate cubic-bezier(0.4, 0, 0.6, 1); }
+        .butterfly-body { position: absolute; top: 4px; left: 16.5px; width: 3px; height: 18px; background: #222; border-radius: 10px; transform: translateZ(2px); transition: background 0.5s ease; }
+        .is-blue .butterfly-body { background: #fff; box-shadow: 0 0 5px #00ffff; }
+
+        @keyframes flap-left { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(70deg); } }
+        @keyframes flap-right { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(-70deg); } }
+
+        /* ================================================= */
+        /* RESPONSİV DİZAYN (Mobil və Planşetlər üçün)      */
+        /* ================================================= */
+        @media (max-width: 800px) {
+            .cards-container {
+                flex-wrap: wrap; 
+                max-width: 350px; 
+                gap: 15px;
+            }
+            .card-wrapper {
+                width: 135px;
+                height: 220px;
+            }
+            .tarot-platform {
+                height: auto;
+                min-height: 55vh;
+                padding-bottom: 25px;
+                align-items: center;
+            }
+            .card-front { padding: 15px 10px; }
+            .card-back { padding: 12px; }
+            .card-symbol { width: 50px; height: 50px; }
+            .card-title { font-size: 14px; }
+            .roman-numeral { font-size: 15px; }
+            .card-back h3 { font-size: 15px; margin-bottom: 8px; }
+            .card-back p { font-size: 11px; line-height: 1.4; }
+            .cloud1, .cloud2 { transform: scale(0.6); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="day"><div class="cloud cloud1"></div><div class="cloud cloud2"></div></div>
+    <div class="night" id="night-sky"></div>
+
+    <div id="particle-container"></div> 
+
+    <div class="tarot-platform">
+        <div class="blur-overlay" id="blur-overlay"></div>
+        
+        <div class="cards-container">
+            <div class="card-wrapper" data-element="water">
+                <div class="tarot-card">
+                    <div class="card-face card-front">
+                        <div class="roman-numeral">I</div>
+                        <div class="card-symbol"><svg viewBox="0 0 100 100"><polygon points="15,25 85,25 50,85" /><path d="M 35,35 Q 50,60 65,35" stroke-width="2"/><circle cx="50" cy="50" r="4" fill="#b89146" stroke="none" /></svg></div>
+                        <div class="card-title">Su<br>Çərşənbəsi</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>Su Çərşənbəsi</h3>
+                        <p>Su — təbiətin təmizlənməsi, həyatın oyanışıdır. Qarlar əriyir, çaylar coşur. İçindəki neqativləri suya ver və ruhən yenidən doğul.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrapper" data-element="fire">
+                <div class="tarot-card">
+                    <div class="card-face card-front">
+                        <div class="roman-numeral">II</div>
+                        <div class="card-symbol"><svg viewBox="0 0 100 100"><polygon points="50,15 85,75 15,75" /><path d="M 50,15 Q 30,50 50,75 Q 70,50 50,15" stroke-width="2"/><circle cx="50" cy="62" r="4" fill="#b89146" stroke="none"/></svg></div>
+                        <div class="card-title">Od<br>Çərşənbəsi</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>Od Çərşənbəsi</h3>
+                        <p>Od — istilik, günəş və enerjidir. Tonqal üzərindən atlanaraq köhnə dərdlərini yandır. Qəlbindəki alovla xəyallarına doğru addımla.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrapper" data-element="wind">
+                <div class="tarot-card">
+                    <div class="card-face card-front">
+                        <div class="roman-numeral">III</div>
+                        <div class="card-symbol"><svg viewBox="0 0 100 100"><polygon points="50,15 85,75 15,75" /><line x1="25" y1="40" x2="75" y2="40" /><path d="M 25,60 Q 50,45 75,60" stroke-width="2" stroke-dasharray="4 4"/></svg></div>
+                        <div class="card-title">Yel<br>Çərşənbəsi</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>Yel Çərşənbəsi</h3>
+                        <p>Yel — dəyişim və yeni nəfəsdir. Oyanmış toxumları torpağa səpir. Həyatına daxil olan yeniliklərə qucaq aç, küləklə rəqs et.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrapper" data-element="earth">
+                <div class="tarot-card">
+                    <div class="card-face card-front">
+                        <div class="roman-numeral">IV</div>
+                        <div class="card-symbol"><svg viewBox="0 0 100 100"><polygon points="15,25 85,25 50,85" /><line x1="25" y1="60" x2="75" y2="60" /><rect x="42" y="32" width="16" height="16" transform="rotate(45 50 40)" stroke-width="2"/></svg></div>
+                        <div class="card-title">Torpaq<br>Çərşənbəsi</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>Torpaq Çərşənbəsi</h3>
+                        <p>Torpaq — bərəkət, dözüm və təməldir. Təbiət tam oyanır, səməni göyərir. Köklərini möhkəmləndir və yeni ilin ruzisini qəbul et.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ulduzlar
+        const nightSky = document.getElementById('night-sky');
+        for (let i = 0; i < 80; i++) {
+            let star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px'; star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            nightSky.appendChild(star);
+        }
+
+        // --- HISSƏCİKLƏR (PARTICLE ENGINE) ---
+        let particleInterval;
+        const particleContainer = document.getElementById('particle-container');
+
+        function startParticles(element) {
+            stopParticles();
+            particleInterval = setInterval(() => {
+                const p = document.createElement('div');
+                p.classList.add('particle', element);
+                
+                const cx = window.innerWidth / 2;
+                const cy = window.innerHeight / 2 - 40; 
+                
+                const spreadX = window.innerWidth > 800 ? 350 : 250;
+                const spreadY = window.innerWidth > 800 ? 450 : 350;
+                
+                const offsetX = (Math.random() - 0.5) * spreadX;
+                const offsetY = (Math.random() - 0.5) * spreadY;
+                
+                p.style.left = (cx + offsetX) + 'px';
+                p.style.top = (cy + offsetY) + 'px';
+                
+                if (element === 'water') {
+                    let size = Math.random() * 10 + 5;
+                    p.style.width = size + 'px'; p.style.height = size + 'px';
+                    p.style.setProperty('--tx', `${(Math.random() - 0.5) * 50}px`);
+                    p.style.setProperty('--ty', `-${Math.random() * 150 + 100}px`); 
+                } else if (element === 'fire') {
+                    p.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
+                    p.style.setProperty('--ty', `-${Math.random() * 200 + 150}px`); 
+                } else if (element === 'wind') {
+                    let length = Math.random() * 40 + 20;
+                    p.style.width = length + 'px';
+                    let angle = (Math.random() - 0.5) * 45; 
+                    p.style.setProperty('--rot', `${angle}deg`); 
+                    p.style.setProperty('--tx', `${Math.random() * 300 + 150}px`); 
+                    p.style.setProperty('--ty', `${(Math.random() - 0.5) * 100}px`);
+                } else if (element === 'earth') {
+                    p.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
+                    p.style.setProperty('--ty', `${Math.random() * 100 + 50}px`); 
+                }
+                
+                particleContainer.appendChild(p);
+                setTimeout(() => { p.remove(); }, 2500);
+            }, 50); 
+        }
+
+        function stopParticles() {
+            clearInterval(particleInterval);
+            particleContainer.innerHTML = '';
+        }
+
+        // --- KARTLARIN İNTERAKTİV MƏRKƏZƏ GƏLMƏSİ (RESPONSİV MİQYAS İLƏ) ---
+        const wrappers = document.querySelectorAll('.card-wrapper');
+        const overlay = document.getElementById('blur-overlay');
+
+        function closeCard() {
+            const activeWrapper = document.querySelector('.card-wrapper.active');
+            if (activeWrapper) {
+                const card = activeWrapper.querySelector('.tarot-card');
+                card.style.transform = ''; 
+                activeWrapper.classList.remove('active');
+                overlay.classList.remove('active');
+                stopParticles(); 
+            }
+        }
+
+        wrappers.forEach(wrapper => {
+            wrapper.addEventListener('click', () => {
+                if (wrapper.classList.contains('active')) {
+                    closeCard();
+                    return;
+                }
+                closeCard(); 
+                
+                const card = wrapper.querySelector('.tarot-card');
+                const rect = wrapper.getBoundingClientRect();
+                const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
+                const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 40; 
+                
+                const scaleValue = window.innerWidth <= 800 ? 1.4 : 1.6;
+                
+                wrapper.classList.add('active');
+                overlay.classList.add('active');
+                
+                card.style.transform = `translate(${centerX}px, ${centerY}px) scale(${scaleValue}) rotateY(180deg)`;
+                
+                const elementType = wrapper.getAttribute('data-element');
+                startParticles(elementType);
+            });
+        });
+
+        overlay.addEventListener('click', closeCard);
+
+        // --- KƏPƏNƏK UÇUŞU ---
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
+        const centerLine = screenW / 2;
+
+        for (let i = 0; i < 20; i++) { createMovingBug(); }
+
+        function createMovingBug() {
+            const container = document.createElement('div');
+            container.classList.add('bug-container', 'is-orange');
+            container.innerHTML = `
+                <div class="butterfly-3d">
+                    <div class="wing wing-left"></div>
+                    <div class="butterfly-body"></div>
+                    <div class="wing wing-right"></div>
+                </div>`;
+            document.body.appendChild(container);
+
+            let x, y, vx, vy, movementType, rot;
+            let angleY = Math.random() * Math.PI * 2;
+            let speedY = 0.02 + Math.random() * 0.05;
+            let amplitudeY = 1.0 + Math.random() * 3.0;
+
+            function resetBug(isInit = false) {
+                x = isInit ? Math.random() * screenW : -50;
+                y = Math.random() * screenH;
+                vx = 1.0 + Math.random() * 2.0;
+                let typeRand = Math.random();
+                
+                if (typeRand < 0.33) { movementType = 'straight'; vy = 0; rot = 0; } 
+                else if (typeRand < 0.66) { movementType = 'wavy'; vy = 0; rot = 0; } 
+                else { movementType = 'up'; vy = 1.0 + Math.random() * 1.5; rot = -25; }
+            }
+
+            resetBug(true);
+
+            function animate() {
+                x += vx;
+
+                if (movementType === 'wavy') {
+                    angleY += speedY; y += Math.sin(angleY) * amplitudeY;
+                } else if (movementType === 'up') {
+                    y -= vy; angleY += speedY; x += Math.sin(angleY) * 0.5; 
+                }
+
+                if (x > screenW + 50 || y < -50 || y > screenH + 50) resetBug();
+
+                if (x > centerLine && container.classList.contains('is-orange')) { container.classList.replace('is-orange', 'is-blue'); } 
+                else if (x <= centerLine && container.classList.contains('is-blue')) { container.classList.replace('is-blue', 'is-orange'); }
+
+                container.style.transform = `translate(${x}px, ${y}px) rotateZ(${rot}deg)`;
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
