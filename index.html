@@ -22,18 +22,42 @@
         }
 
         /* Arxa Planlar */
-        .day { width: 50%; height: 100%; background: linear-gradient(180deg, #4da8da 0%, #87CEEB 40%, #e0f6ff 100%); position: relative; overflow: hidden; }
+        .day { 
+            width: 50%; 
+            height: 100%; 
+            background: linear-gradient(180deg, #4da8da 0%, #a2d7ff 100%); 
+            position: relative; 
+            overflow: hidden; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .night { width: 50%; height: 100%; background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); position: relative; overflow: hidden; }
 
-        /* Buludlar */
-        .cloud { position: absolute; background: #fff; border-radius: 50px; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.1); opacity: 0.9; }
-        .cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
-        .cloud1 { width: 150px; height: 50px; top: 15%; left: 10%; }
-        .cloud1::before { width: 70px; height: 70px; top: -35px; left: 20px; }
-        .cloud1::after { width: 90px; height: 90px; top: -45px; right: 15px; }
-        .cloud2 { width: 200px; height: 60px; top: 30%; left: 60%; transform: scale(0.8); }
-        .cloud2::before { width: 80px; height: 80px; top: -40px; left: 30px; }
-        .cloud2::after { width: 100px; height: 100px; top: -50px; right: 25px; }
+        /* Göy qurşağı (Buludların yerinə) */
+        .rainbow-halo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140%; 
+            height: 140%;
+            background: radial-gradient(
+                circle at center,
+                transparent 35%,
+                rgba(255, 0, 0, 0.12) 40%,
+                rgba(255, 165, 0, 0.12) 44%,
+                rgba(255, 255, 0, 0.1) 48%,
+                rgba(0, 128, 0, 0.08) 52%,
+                rgba(0, 0, 255, 0.08) 56%,
+                rgba(75, 0, 130, 0.07) 60%,
+                rgba(238, 130, 238, 0.07) 64%,
+                transparent 70%
+            );
+            filter: blur(8px);
+            pointer-events: none;
+            z-index: 1;
+        }
 
         /* Ulduzlar */
         .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.8); animation: twinkle 2s infinite ease-in-out alternate; }
@@ -139,7 +163,9 @@
 </head>
 <body>
 
-    <div class="day"><div class="cloud cloud1"></div><div class="cloud cloud2"></div></div>
+    <div class="day">
+        <div class="rainbow-halo"></div>
+    </div>
     <div class="night" id="night-sky"></div>
 
     <div id="particle-container"></div> 
@@ -369,4 +395,5 @@
         }
     </script>
 </body>
+
 </html>
