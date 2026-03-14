@@ -488,34 +488,6 @@
             }
             animate();
         }
-
-        // --- KƏPƏNƏKLƏRİN ÜRKMƏSİ (Ekrana klikləyəndə) ---
-        let isStartleCooldown = false;
-
-        document.body.addEventListener('click', (e) => {
-            // Açıq kart varsa ürkmürlər
-            if (document.querySelector('.card-wrapper.active')) return;
-            // Karta kliklənibsə ürkmürlər
-            if (e.target.closest('.tarot-card')) return;
-
-            if (isStartleCooldown) return;
-            isStartleCooldown = true;
-
-            const allBugContainers = document.querySelectorAll('.bug-container');
-            allBugContainers.forEach(bug => {
-                bug.setAttribute('data-startled', 'true');
-                bug.classList.add('startled'); 
-            });
-
-            // 1.2 saniyə sonra panika bitir
-            setTimeout(() => {
-                allBugContainers.forEach(bug => {
-                    bug.removeAttribute('data-startled');
-                    bug.classList.remove('startled');
-                });
-                isStartleCooldown = false;
-            }, 1200); 
-        });
     </script>
 </body>
 </html>
