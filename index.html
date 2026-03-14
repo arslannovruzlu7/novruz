@@ -46,7 +46,6 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             transition: all 0.4s ease;
-            /* DƏYİŞİKLİK BURADADIR: z-index 200-dən 8-ə endirildi ki, kart açılanda arxada qalıb blurlansın */
             z-index: 8; 
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
             outline: none;
@@ -164,9 +163,9 @@
 
         .cards-container { display: flex; justify-content: center; gap: 30px; position: relative; } 
         
-        /* Kartların Ümumi Tənzimləmələri */
+        /* --- DƏYİŞİKLİK: Kompüterdə də mətni tam sığdırmaq üçün baza ölçü azca böyüdüldü --- */
         .card-wrapper { 
-            width: 180px; height: 300px; perspective: 1200px; position: relative; z-index: 1; 
+            width: 190px; height: 310px; perspective: 1200px; position: relative; z-index: 1; 
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease, z-index 0s 0.6s; 
             will-change: transform; 
         }
@@ -188,16 +187,17 @@
         
         .card-front { justify-content: space-between; padding: 30px 15px; }
         
+        /* --- DƏYİŞİKLİK: Mətn çərçivədən kənara çıxmasın deyə yuxarı-aşağı daxili boşluq artırıldı --- */
         .card-back { 
             transform: rotateY(180deg) translateZ(0); 
             justify-content: center; 
             align-items: center;
-            padding: 25px 20px; 
+            padding: 28px 18px; 
             text-align: center; 
             background: linear-gradient(145deg, #0b0e14, #1a2233); 
         }
         
-        .card-back p { font-size: 11px; line-height: 1.6; color: #e0cca0; margin: 0; }
+        .card-back p { font-size: 11px; line-height: 1.5; color: #e0cca0; margin: 0; }
 
         .card-wrapper:not(.active):not(.merged) .tarot-card:hover { transform: translateY(-20px) rotateY(10deg); }
         .card-wrapper:not(.active):not(.merged) .tarot-card:hover .card-face { border-color: #ffd700; box-shadow: -10px 25px 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(220, 182, 98, 0.3); }
@@ -212,7 +212,6 @@
         .card-title::before { content: '— ✧ —'; display: block; font-size: 14px; color: #b89146; margin-bottom: 8px; letter-spacing: 2px; opacity: 0.9; font-weight: normal; }
         .card-title { font-size: 18px; font-weight: bold; text-align: center; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; }
 
-        /* --- ŞİRİN VƏ SEVİMLİ NOVRUZ KARTI ANİMASİYASI --- */
         .novruz-wrapper {
             position: absolute;
             left: 50%;
@@ -251,16 +250,22 @@
         @keyframes flap-left { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(70deg); } }
         @keyframes flap-right { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(-70deg); } }
 
+        /* ================================================= */
+        /* RESPONSİV DİZAYN (Mobil və Planşetlər üçün)       */
+        /* ================================================= */
         @media (max-width: 800px) {
             .cards-container { flex-wrap: wrap; max-width: 360px; gap: 15px; }
-            .card-wrapper { width: 150px; height: 250px; }
+            /* DƏYİŞİKLİK: Mobil üçün kartın hündürlüyü artırıldı ki, yazılar tam sığsın */
+            .card-wrapper { width: 150px; height: 270px; }
             .tarot-platform { height: auto; min-height: 55vh; padding-bottom: 25px; align-items: center; }
             .card-front { padding: 15px 10px; }
             .card-symbol { width: 60px; height: 60px; margin-top: 10px; margin-bottom: 10px; }
             .card-title { font-size: 15px; }
             .roman-numeral { font-size: 16px; }
-            .card-back { padding: 22px 15px; } 
-            .card-back p { font-size: 9.5px; line-height: 1.5; }
+            /* DƏYİŞİKLİK: Mətnin sərhədi aşmaması üçün üst və alt padding artırıldı */
+            .card-back { padding: 28px 15px; } 
+            /* DƏYİŞİKLİK: Şrift bir azca sıxlaşdırıldı ki, yer qazanılsın */
+            .card-back p { font-size: 9px; line-height: 1.4; }
         }
     </style>
 </head>
@@ -456,14 +461,8 @@
                 const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
                 const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 20; 
                 
-                let scaleValue = (window.innerHeight * 0.85) / rect.height;
-                if (window.innerWidth > 800) {
-                    if (scaleValue > 2.4) scaleValue = 2.4; 
-                    if (scaleValue < 1.6) scaleValue = 1.6; 
-                } else {
-                    if (scaleValue > 2.0) scaleValue = 2.0; 
-                    if (scaleValue < 1.4) scaleValue = 1.4; 
-                }
+                // Mətnlərin tam oxunması və sığması üçün kart əvvəlkindən daha çox böyüyür
+                let scaleValue = (window.innerHeight * 0.85) / rect.height; 
                 
                 wrapper.classList.add('active');
                 overlay.classList.add('active');
@@ -492,7 +491,7 @@
             const rotations = [-15, -5, 5, 15]; 
 
             if (isMerged) {
-                mergeBtn.innerHTML = 'Parçala ✧';
+                mergeBtn.innerHTML = '✧';
                 
                 const screenCenterX = window.innerWidth / 2;
                 const screenCenterY = window.innerHeight / 2;
