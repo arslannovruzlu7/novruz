@@ -23,53 +23,79 @@
         body {
             height: 100vh;
             width: 100%;
+            display: flex; /* Ekranı dəqiqliklə 50/50 bölürük */
             position: relative;
             background-color: #000;
         }
 
-        /* --- ARXA PLANLAR VƏ YUMŞAQ KEÇİD (BLENDING) --- */
+        /* --- ARXA PLANLAR VƏ ORTA KEÇİD --- */
         .day { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; 
+            width: 50%; /* Gündüz tam olaraq yarısını tutur */
             height: 100%; 
             background: linear-gradient(180deg, #4da8da 0%, #a2d7ff 100%); 
+            position: relative; 
             overflow: hidden; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .night { 
-            position: absolute; 
-            top: 0; right: 0; 
-            width: 60%; 
-            height: 100%; 
-            background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); 
-            overflow: hidden; 
-            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
-            mask-image: linear-gradient(to left, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
+        /* Gündüzün sağ tərəfindəki rəngi tündləşdirərək gecəyə bağlayan zərif kölgə effekti */
+        .day::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 25%; /* Yalnız sərhədə yaxın hissədə keçid edir */
+            height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(13, 26, 58, 0.6) 70%, rgba(5, 9, 20, 1) 100%);
+            pointer-events: none;
             z-index: 2;
         }
 
-        /* --- DAHA AYDIN GÖY QURŞAĞI --- */
+        .night { 
+            width: 50%; /* Ulduzlar qətiyyən bu 50%-dən kənara çıxa bilməz */
+            height: 100%; 
+            background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        /* Gecənin sol kənarını sərhəddə gündüzlə yumşaq şəkildə birləşdirən xətt */
+        .night::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5%;
+            height: 100%;
+            background: linear-gradient(to left, transparent 0%, rgba(5, 9, 20, 1) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* --- GÖY QURŞAĞI --- */
         .rainbow-halo {
             position: absolute;
             top: 50%;
-            left: 25%; 
+            left: 50%; 
             transform: translate(-50%, -50%);
-            width: 70%; 
+            width: 140%; 
             height: 140%;
+            /* Rənglər və şəffaflıq daha zərif və mistik hala gətirildi */
             background: radial-gradient(
                 circle at center,
-                transparent 25%,
-                rgba(255, 0, 0, 0.45) 33%,      
-                rgba(255, 165, 0, 0.45) 38%,    
-                rgba(255, 255, 0, 0.4) 43%,   
-                rgba(0, 128, 0, 0.35) 48%,      
-                rgba(0, 0, 255, 0.35) 53%,      
-                rgba(75, 0, 130, 0.3) 58%,    
-                rgba(238, 130, 238, 0.3) 63%, 
-                transparent 72%
+                transparent 30%,
+                rgba(255, 0, 0, 0.2) 35%,
+                rgba(255, 165, 0, 0.2) 40%,
+                rgba(255, 255, 0, 0.15) 45%,
+                rgba(0, 128, 0, 0.1) 50%,
+                rgba(0, 0, 255, 0.1) 55%,
+                rgba(75, 0, 130, 0.08) 60%,
+                rgba(238, 130, 238, 0.08) 65%,
+                transparent 75%
             );
-            filter: blur(8px);
+            filter: blur(10px);
             pointer-events: none;
             z-index: 1;
         }
