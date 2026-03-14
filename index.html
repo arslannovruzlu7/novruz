@@ -61,19 +61,34 @@
             overflow: hidden; 
         }
 
-        /* Gecənin sol kənarını sərhəddə gündüzlə yumşaq şəkildə birləşdirən xətt */
-        .night::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5%;
-            height: 100%;
-            background: linear-gradient(to left, transparent 0%, rgba(5, 9, 20, 1) 100%);
-            pointer-events: none;
+        .night { 
+            position: absolute; 
+            top: 0; right: 0; 
+            width: 60%; /* Gecə ekranın sağdan 60%-ni tutur */
+            height: 100%; 
+            background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); 
+            overflow: hidden; 
+            /* Gecənin sol kənarını yavaş-yavaş şəffaflaşdıraraq gündüzlə yumşaq qarışdırır (30%-dən 100%-ə qədər yumşaq keçid) */
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
             z-index: 2;
         }
 
+        /* --- LAYERING BUTTERFLIES FOR CROSSING EFFECT (DUPLICATE AND MASK) --- */
+        /* Kəpənəklərin üst-üstə düzülməsi üçün konteyner daxilində layering */
+        .butterfly-3d { position: absolute; top: 0; left: 0; }
+        
+        /* Gecə tərəfin maskası (mavi kəpənək üçün) - sol tərəfi (gündüzü) gizlədir */
+        .container.is-blue .butterfly-3d { 
+            -webkit-mask-image: linear-gradient(to left, transparent calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%), black calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%)); 
+            mask-image: linear-gradient(to left, transparent calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%), black calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%)); 
+        }
+
+        /* Gündüz tərəfin maskası (orange kəpənək üçün) - sağ tərəfi (gecəni) gizlədir */
+        .container.is-orange .butterfly-3d { 
+            -webkit-mask-image: linear-gradient(to right, transparent calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%), black calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%)); 
+            mask-image: linear-gradient(to right, transparent calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%), black calc(50% - (var(--screen-width) / 2 - var(--x-pos)) / 36 * 100%)); 
+        }
         /* --- GÖY QURŞAĞI --- */
         .rainbow-halo {
             position: absolute;
@@ -379,22 +394,31 @@
 
         overlay.addEventListener('click', closeCard);
 
-        // --- KƏPƏNƏK UÇUŞU ---
+// --- KƏPƏNƏK UÇUŞU ---
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
         const centerLine = screenW / 2;
+        
+        // CSS dəyişənlərini JS-dən tənzimləyirik
+        document.documentElement.style.setProperty('--screen-width', screenW + 'px');
 
         for (let i = 0; i < 20; i++) { createMovingBug(); }
 
         function createMovingBug() {
             const container = document.createElement('div');
-            container.classList.add('bug-container', 'is-orange');
-            container.innerHTML = `
-                <div class="butterfly-3d">
-                    <div class="wing wing-left"></div>
-                    <div class="butterfly-body"></div>
-                    <div class="wing wing-right"></div>
-                </div>`;
+            container.classList.add('bug-container');
+            
+            // Konsepti tətbiq edirik: üst-üstə layered iki kəpənək modeli (orange və blue)
+            const orangeModel = document.createElement('div');
+            orangeModel.classList.add('butterfly-3d', 'is-orange');
+            orangeModel.innerHTML = `<div class="wing wing-left"></div><div class="butterfly-body"></div><div class="wing wing-right"></div>`;
+            container.appendChild(orangeModel);
+            
+            const blueModel = document.createElement('div');
+            blueModel.classList.add('butterfly-3d', 'is-blue');
+            blueModel.innerHTML = `<div class="wing wing-left"></div><div class="butterfly-body"></div><div class="wing wing-right"></div>`;
+            container.appendChild(blueModel);
+            
             document.body.appendChild(container);
 
             let x, y, vx, vy, movementType, rot;
@@ -426,8 +450,14 @@
 
                 if (x > screenW + 50 || y < -50 || y > screenH + 50) resetBug();
 
-                if (x > centerLine && container.classList.contains('is-orange')) { container.classList.replace('is-orange', 'is-blue'); } 
-                else if (x <= centerLine && container.classList.contains('is-blue')) { container.classList.replace('is-blue', 'is-orange'); }
+                // Layered kəpənəkləri mövqeyə görə rəngini dəyişmək üçün maskaları tənzimləyirik (Duplicate and Mask texnikası)
+                // Hər kəpənəyə öz mövqeyi üçün fərdi maska tətbiq edirik
+                container.style.setProperty('--x-pos', x + 'px');
+                
+                // Ulduzların gündüzə keçməməsini JS ilə tənzimləyirik - ulduzlar yalnız night containerində yaranır
+                // Kəpənəyin yerini toggle edirik (is-blue/is-orange siniflərinə maskalar CSS-də tətbiq olunub)
+                container.classList.toggle('is-blue', x > centerLine); 
+                container.classList.toggle('is-orange', x <= centerLine);
 
                 container.style.transform = `translate(${x}px, ${y}px) rotateZ(${rot}deg)`;
                 requestAnimationFrame(animate);
