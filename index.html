@@ -97,9 +97,28 @@
             z-index: 1;
         }
 
-        /* Ulduzlar */
-        .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.8); animation: twinkle 2s infinite ease-in-out alternate; }
-        @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+        /* --- ULDUZLAR VƏ ARTIRILMIŞ PARILTI --- */
+        .star { 
+            position: absolute; 
+            background: #fff; 
+            border-radius: 50%; 
+            /* İkiqat və daha geniş parıltı effekti */
+            box-shadow: 0 0 12px 3px rgba(255, 255, 255, 1), 0 0 22px 6px rgba(255, 255, 255, 0.6); 
+            animation: twinkle 1.5s infinite ease-in-out alternate; /* Daha sürətli yanıb-sönmə */
+        }
+        
+        @keyframes twinkle { 
+            0% { 
+                opacity: 0.4; 
+                transform: scale(0.8); 
+                box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.5); 
+            } 
+            100% { 
+                opacity: 1; 
+                transform: scale(1.4); /* Parlayanda böyüyür */
+                box-shadow: 0 0 15px 4px rgba(255, 255, 255, 1), 0 0 30px 10px rgba(255, 255, 255, 0.8); 
+            } 
+        }
 
         /* MİSTİK TAROT PLATFORMASI */
         .tarot-platform { position: absolute; bottom: 0; left: 0; width: 100%; height: 45vh; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 40px; z-index: 10; }
@@ -129,7 +148,6 @@
         /* TAROT KARTLARI */
         .cards-container { display: flex; justify-content: center; gap: 30px; position: relative; } 
         
-        /* Baza kart ölçüsü böyüdüldü ki, mətni daha rahat sığdırsın */
         .card-wrapper { width: 180px; height: 300px; perspective: 1200px; position: relative; z-index: 1; transition: z-index 0s 0.6s; }
         .card-wrapper.active { z-index: 100; transition: z-index 0s; }
 
@@ -139,7 +157,6 @@
         
         .card-front { justify-content: space-between; padding: 30px 15px; }
         
-        /* Arxa tərəf - yalnız mərkəzləşdirilmiş mətn üçündür */
         .card-back { 
             transform: rotateY(180deg); 
             justify-content: center; 
@@ -149,7 +166,6 @@
             background: linear-gradient(145deg, #0b0e14, #1a2233); 
         }
         
-        /* Mətn ölçüləri sığışdırmaq üçün dəqiqləşdirilib */
         .card-back p { 
             font-size: 11px; 
             line-height: 1.6; 
@@ -166,6 +182,19 @@
         .roman-numeral { font-size: 20px; font-weight: bold; letter-spacing: 2px; }
         .card-symbol { width: 80px; height: 80px; display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 15px; }
         .card-symbol svg { width: 100%; height: 100%; fill: none; stroke: #b89146; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: all 0.4s ease; }
+        
+        /* --- ZƏRİF SİMVOL YALNIZ İLKİN (ÖN) VƏZİYYƏTDƏ GÖRÜNÜR --- */
+        .card-title::before {
+            content: '— ✧ —';
+            display: block;
+            font-size: 14px;
+            color: #b89146;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+        
         .card-title { font-size: 18px; font-weight: bold; text-align: center; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; }
 
         /* 3D KƏPƏNƏKLƏR */
@@ -178,6 +207,10 @@
         
         .wing-left { left: 0; border-radius: 20% 100% 10% 80%; transform-origin: right center; animation: flap-left 0.1s infinite alternate cubic-bezier(0.4, 0, 0.6, 1); }
         .wing-right { left: 18px; border-radius: 100% 20% 80% 10%; transform-origin: left center; animation: flap-right 0.1s infinite alternate cubic-bezier(0.4, 0, 0.6, 1); }
+        
+        /* Ürkən statusda qanadlar Frantik çırpılır */
+        .bug-container.startled .wing { animation-duration: 0.03s !important; }
+
         .butterfly-body { position: absolute; top: 4px; left: 16.5px; width: 3px; height: 18px; background: #222; border-radius: 10px; transform: translateZ(2px); transition: background 0.5s ease; }
         .is-blue .butterfly-body { background: #fff; box-shadow: 0 0 5px #00ffff; }
 
@@ -332,7 +365,7 @@
             particleContainer.innerHTML = '';
         }
 
-        // --- KARTLARIN İNTERAKTİV MƏRKƏZƏ GƏLMƏSİ (DİNAMİK BÖYÜMƏ İLƏ) ---
+        // --- KARTLARIN İNTERAKTİV MƏRKƏZƏ GƏLMƏSİ (DİNAMİK BÖYÜMƏ) ---
         const wrappers = document.querySelectorAll('.card-wrapper');
         const overlay = document.getElementById('blur-overlay');
 
@@ -360,7 +393,7 @@
                 const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
                 const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 20; 
                 
-                // Mətnlərin tam oxunaqlı və nəhəng olması üçün dinamik miqyaslama (75% ekran hündürlüyü tutacaq)
+                // Mətnlərin tam oxunaqlı olması üçün dinamik miqyaslama (75% ekran hündürlüyü)
                 let scaleValue = (window.innerHeight * 0.75) / rect.height;
                 if (window.innerWidth > 800) {
                     if (scaleValue > 2.2) scaleValue = 2.2;
@@ -419,15 +452,28 @@
             resetBug(true);
 
             function animate() {
-                x += vx;
+                let currentVx = vx;
+                let currentVy = vy;
+
+                // Kəpənək ürkümüş vəziyyətdədirsə sürəti artır və xaotik olur
+                if (container.hasAttribute('data-startled')) {
+                    currentVx = vx * 3.5; 
+                    if (movementType !== 'up') {
+                        y += (Math.random() - 0.5) * 6; 
+                    } else {
+                        currentVy = vy * 2.5; 
+                    }
+                }
+
+                x += currentVx;
 
                 if (movementType === 'wavy') {
                     angleY += speedY; y += Math.sin(angleY) * amplitudeY;
                 } else if (movementType === 'up') {
-                    y -= vy; angleY += speedY; x += Math.sin(angleY) * 0.5; 
+                    y -= currentVy; angleY += speedY; x += Math.sin(angleY) * 0.5; 
                 }
 
-                if (x > screenW + 50 || y < -50 || y > screenH + 50) resetBug();
+                if (x > screenW + 150 || x < -150 || y < -150 || y > screenH + 150) resetBug();
 
                 let butterflyCenterX = x + 18;
 
@@ -442,6 +488,34 @@
             }
             animate();
         }
+
+        // --- KƏPƏNƏKLƏRİN ÜRKMƏSİ (Ekrana klikləyəndə) ---
+        let isStartleCooldown = false;
+
+        document.body.addEventListener('click', (e) => {
+            // Açıq kart varsa ürkmürlər
+            if (document.querySelector('.card-wrapper.active')) return;
+            // Karta kliklənibsə ürkmürlər
+            if (e.target.closest('.tarot-card')) return;
+
+            if (isStartleCooldown) return;
+            isStartleCooldown = true;
+
+            const allBugContainers = document.querySelectorAll('.bug-container');
+            allBugContainers.forEach(bug => {
+                bug.setAttribute('data-startled', 'true');
+                bug.classList.add('startled'); 
+            });
+
+            // 1.2 saniyə sonra panika bitir
+            setTimeout(() => {
+                allBugContainers.forEach(bug => {
+                    bug.removeAttribute('data-startled');
+                    bug.classList.remove('startled');
+                });
+                isStartleCooldown = false;
+            }, 1200); 
+        });
     </script>
 </body>
 </html>
