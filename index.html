@@ -86,7 +86,7 @@
             background: linear-gradient(180deg, #050914 0%, #0d1a3a 50%, #1e3b70 100%); 
             position: relative; 
             overflow: hidden; 
-            transform: translateZ(0); /* GPU Sürətləndirməsi qorundu */
+            transform: translateZ(0); 
         }
 
         .night::before {
@@ -124,7 +124,7 @@
             filter: blur(8px); 
             pointer-events: none;
             z-index: 1;
-            will-change: transform; /* GPU Sürətləndirməsi qorundu */
+            will-change: transform; 
         }
 
         /* Ulduzlar */
@@ -132,7 +132,7 @@
             position: absolute; background: #fff; border-radius: 50%; 
             box-shadow: 0 0 12px 3px rgba(255, 255, 255, 1), 0 0 22px 6px rgba(255, 255, 255, 0.6); 
             animation: twinkle 1.5s infinite ease-in-out alternate; 
-            will-change: opacity, transform; /* GPU Sürətləndirməsi qorundu */
+            will-change: opacity, transform; 
         }
         @keyframes twinkle { 
             0% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.5); } 
@@ -147,7 +147,7 @@
         .blur-overlay.active { opacity: 1; pointer-events: auto; }
 
         #particle-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; }
-        .particle { position: absolute; opacity: 0; pointer-events: none; will-change: transform, opacity; /* GPU Sürətləndirməsi qorundu */ }
+        .particle { position: absolute; opacity: 0; pointer-events: none; will-change: transform, opacity; }
 
         .particle.water { border-radius: 50%; border: 1px solid rgba(150, 220, 255, 0.8); background: rgba(100, 200, 255, 0.2); animation: float-bubble 2s ease-in forwards; }
         @keyframes float-bubble { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; } }
@@ -167,30 +167,31 @@
         .card-wrapper { 
             width: 180px; height: 300px; perspective: 1200px; position: relative; z-index: 1; 
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease, z-index 0s 0.6s; 
-            will-change: transform; /* GPU Sürətləndirməsi qorundu */
+            will-change: transform; 
         }
         
-        /* Kartların birləşmə (yoxa çıxma) halı - YENİLƏNİB */
+        /* --- YENİ BİRLƏŞMƏ: Çox şirin, yelpik kimi yığılma --- */
         .card-wrapper.merged {
-            transform: translate(var(--merge-x), var(--merge-y)) scale(0.2);
+            /* rotateZ indi var(--merge-rot) ilə JS-dən idarə olunur */
+            transform: translate(var(--merge-x), var(--merge-y)) scale(0.3) rotateZ(var(--merge-rot, 0deg));
             opacity: 0;
-            filter: blur(5px); /* Daha yumşaq keçid üçün dumanlanma */
+            filter: blur(3px); 
             pointer-events: none;
             z-index: -1;
-            /* Fırlanma silindi, keçid müddəti və bezier daha yumşaq oldu */
-            transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease, filter 0.8s ease, z-index 0s 1s;
+            /* Zərif və dinamik süzülmə effekti */
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease, filter 1.2s ease, z-index 0s 1.2s;
         }
 
         .card-wrapper.active { z-index: 100; transition: z-index 0s; }
 
-        .tarot-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; will-change: transform; /* GPU Sürətləndirməsi qorundu */ }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(145deg, #161c27, #0b0e14); border: 2px solid #b89146; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(184, 145, 70, 0.15); display: flex; flex-direction: column; align-items: center; color: #dcb662; transition: all 0.4s ease; transform: translateZ(0); /* GPU Sürətləndirməsi qorundu */ }
+        .tarot-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; will-change: transform; }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(145deg, #161c27, #0b0e14); border: 2px solid #b89146; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(184, 145, 70, 0.15); display: flex; flex-direction: column; align-items: center; color: #dcb662; transition: all 0.4s ease; transform: translateZ(0); }
         .card-face::before { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(220, 182, 98, 0.4); border-radius: 6px; pointer-events: none; }
         
         .card-front { justify-content: space-between; padding: 30px 15px; }
         
         .card-back { 
-            transform: rotateY(180deg) translateZ(0); /* GPU Sürətləndirməsi qorundu */ 
+            transform: rotateY(180deg) translateZ(0); 
             justify-content: center; 
             align-items: center;
             padding: 20px 15px; 
@@ -213,30 +214,29 @@
         .card-title::before { content: '— ✧ —'; display: block; font-size: 14px; color: #b89146; margin-bottom: 8px; letter-spacing: 2px; opacity: 0.9; font-weight: normal; }
         .card-title { font-size: 18px; font-weight: bold; text-align: center; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; }
 
-        /* --- XÜSUSİ NOVRUZ KARTI TƏNZİMLƏMƏLƏRİ - YENİLƏNİB --- */
+        /* --- ŞİRİN VƏ SEVİMLİ NOVRUZ KARTI ANİMASİYASI --- */
         .novruz-wrapper {
             position: absolute;
             left: 50%;
             top: 50%;
-            /* Fırlanma silindi, miqyas elastik şəkildə peyda olacaq */
-            transform: translate(-50%, -50%) scale(0);
+            /* Çox yüngül kənara əyilmiş formada doğulmağa başlayır */
+            transform: translate(-50%, -50%) scale(0) rotateZ(-10deg);
             opacity: 0;
             pointer-events: none;
-            /* Cubic-bezier elastik effekt üçün dəyişdirildi */
-            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1s ease;
+            /* Sevimli, yumşaq "spring" sıçrayış effekti */
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease;
             z-index: 5;
-            will-change: transform, opacity; /* GPU Sürətləndirməsi qorundu */
+            will-change: transform, opacity; 
         }
         
         .novruz-wrapper.show {
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) scale(1) rotateZ(0deg);
             opacity: 1;
             pointer-events: auto;
         }
 
         .novruz-wrapper.active { z-index: 100; }
         
-        /* Novruz kartı üçün arxa plan və kölgələr daha parlaq */
         .novruz-wrapper .card-face { border-color: #ffd700; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 30px rgba(255, 215, 0, 0.2); }
         .novruz-wrapper .card-symbol svg { stroke: #ffd700; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4)); }
         
@@ -357,7 +357,6 @@
     </div>
 
     <script>
-        // Mobil yoxlaması - Performans üçün (SAY SİSTEMİ qorundu)
         const isMobile = window.innerWidth <= 800;
 
         const nightSky = document.getElementById('night-sky');
@@ -373,7 +372,7 @@
 
         let particleInterval;
         const particleContainer = document.getElementById('particle-container');
-        const particleIntervalTime = isMobile ? 120 : 50; /* Optimizasiya qorundu */
+        const particleIntervalTime = isMobile ? 120 : 50; 
 
         function startParticles(element) {
             stopParticles();
@@ -409,7 +408,6 @@
                     p.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
                     p.style.setProperty('--ty', `${Math.random() * 100 + 50}px`); 
                 } else if (element === 'novruz') {
-                    // Novruz kartına özəl sehrli qızılı parıltı effekti
                     let size = Math.random() * 6 + 2;
                     p.style.width = size + 'px'; p.style.height = size + 'px';
                     p.style.background = Math.random() > 0.5 ? '#ffd700' : '#ffffff';
@@ -430,7 +428,6 @@
             particleContainer.innerHTML = '';
         }
 
-        // --- BİRLƏŞMƏ (MERGE) MƏNTİQİ VƏ KART TIKLAMALARI ---
         const wrappers = document.querySelectorAll('.card-wrapper');
         const standardCards = document.querySelectorAll('.standard-card');
         const novruzCard = document.getElementById('novruz-card');
@@ -451,7 +448,6 @@
 
         wrappers.forEach(wrapper => {
             wrapper.addEventListener('click', () => {
-                // Əgər kart artıq açıqdırsa bağla
                 if (wrapper.classList.contains('active')) {
                     closeCard();
                     return;
@@ -461,11 +457,9 @@
                 const card = wrapper.querySelector('.tarot-card');
                 const rect = wrapper.getBoundingClientRect();
                 
-                // Kartı mərkəzə çəkmək üçün hesablamalar
                 const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
                 const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 20; 
                 
-                // Mətnlərin oxunaqlı olması üçün dinamik miqyaslama
                 let scaleValue = (window.innerHeight * 0.75) / rect.height;
                 if (window.innerWidth > 800) {
                     if (scaleValue > 2.2) scaleValue = 2.2;
@@ -486,64 +480,70 @@
 
         overlay.addEventListener('click', closeCard);
 
-        // Butona Tıklama Reaksiyası (Birləşmə / Parçalanma)
         mergeBtn.addEventListener('click', () => {
-            // Əgər açıq kart varsa, əvvəlcə onu bağla, sonra birləşdir
             if (document.querySelector('.card-wrapper.active')) {
                 closeCard();
-                setTimeout(toggleMerge, 600); // Kartın yerinə qayıtmasını gözlə
+                setTimeout(toggleMerge, 600); 
             } else {
                 toggleMerge();
             }
         });
 
+        /* --- YENİ BİRLƏŞMƏ: Ardıcıllıq (Stagger) əlavə edildi --- */
         function toggleMerge() {
             isMerged = !isMerged;
             const container = document.querySelector('.cards-container');
             const containerRect = container.getBoundingClientRect();
+            // Kartlara şirin yelpik effekti üçün yüngül fırlanma dərəcələri
+            const rotations = [-15, -5, 5, 15]; 
 
             if (isMerged) {
-                mergeBtn.innerHTML = '✧';
+                mergeBtn.innerHTML = 'Parçala ✧';
                 
                 const screenCenterX = window.innerWidth / 2;
                 const screenCenterY = window.innerHeight / 2;
                 
-                standardCards.forEach(card => {
-                    // Hover effektlərinin hesablamağa mane olmaması üçün dəqiq mövqe hesabı
-                    const cardCenterX = containerRect.left + card.offsetLeft + card.offsetWidth / 2;
-                    const cardCenterY = containerRect.top + card.offsetTop + card.offsetHeight / 2;
-                    
-                    const moveX = screenCenterX - cardCenterX;
-                    const moveY = screenCenterY - cardCenterY;
-                    
-                    card.style.setProperty('--merge-x', `${moveX}px`);
-                    card.style.setProperty('--merge-y', `${moveY}px`);
-                    card.classList.add('merged');
+                // Kartlar bir-birinin ardınca yığılır (stagger effekti)
+                standardCards.forEach((card, index) => {
+                    setTimeout(() => {
+                        const cardCenterX = containerRect.left + card.offsetLeft + card.offsetWidth / 2;
+                        const cardCenterY = containerRect.top + card.offsetTop + card.offsetHeight / 2;
+                        
+                        const moveX = screenCenterX - cardCenterX;
+                        const moveY = screenCenterY - cardCenterY;
+                        
+                        card.style.setProperty('--merge-x', `${moveX}px`);
+                        card.style.setProperty('--merge-y', `${moveY}px`);
+                        card.style.setProperty('--merge-rot', `${rotations[index]}deg`);
+                        card.classList.add('merged');
+                    }, index * 100); // Hər karta 100ms gecikmə
                 });
 
-                // Kartlar yoxa çıxmağa başlayanda Novruz kartı peyda olur
+                // Sonuncu kart yığıldıqdan sonra Novruz kartı şirin şəkildə peyda olur
                 setTimeout(() => {
                     novruzCard.classList.add('show');
-                }, 400); 
+                }, 400 + (standardCards.length * 100)); 
                 
             } else {
                 mergeBtn.innerHTML = '✦';
                 novruzCard.classList.remove('show');
 
-                // Novruz kartı yoxa çıxandan sonra 4 kart geri qayıdır
+                // Novruz kartı getdikdən sonra 4 kart ardıcıllıqla öz yerinə qayıdır
                 setTimeout(() => {
-                    standardCards.forEach(card => {
-                        card.classList.remove('merged');
+                    standardCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.remove('merged');
+                        }, index * 100);
                     });
-                }, 400);
+                }, 500);
             }
         }
 
-        // --- KƏPƏNƏK UÇUŞU ---
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
         const centerLine = screenW / 2;
-        const bugCount = isMobile ? 6 : 20; /* Optimizasiya qorundu */
+        // YENİ: Kəpənəklərin sayı telefonda 11, kompüterdə 25-dir
+        const bugCount = isMobile ? 11 : 25; 
 
         for (let i = 0; i < bugCount; i++) { createMovingBug(); }
 
@@ -595,7 +595,6 @@
                     container.classList.replace('is-blue', 'is-orange'); 
                 }
 
-                // Translate3d ilə daha rəvan animasiya qorundu
                 container.style.transform = `translate3d(${x}px, ${y}px, 0) rotateZ(${rot}deg)`;
                 requestAnimationFrame(animate);
             }
