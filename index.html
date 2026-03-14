@@ -172,13 +172,11 @@
         
         /* --- YENİ BİRLƏŞMƏ: Çox şirin, yelpik kimi yığılma --- */
         .card-wrapper.merged {
-            /* rotateZ indi var(--merge-rot) ilə JS-dən idarə olunur */
             transform: translate(var(--merge-x), var(--merge-y)) scale(0.3) rotateZ(var(--merge-rot, 0deg));
             opacity: 0;
             filter: blur(3px); 
             pointer-events: none;
             z-index: -1;
-            /* Zərif və dinamik süzülmə effekti */
             transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease, filter 1.2s ease, z-index 0s 1.2s;
         }
 
@@ -194,7 +192,7 @@
             transform: rotateY(180deg) translateZ(0); 
             justify-content: center; 
             align-items: center;
-            padding: 20px 15px; 
+            padding: 25px 20px; /* DƏYİŞİKLİK: Mətnin xəttin üstünə düşməməsi üçün padding artırıldı */
             text-align: center; 
             background: linear-gradient(145deg, #0b0e14, #1a2233); 
         }
@@ -219,11 +217,9 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            /* Çox yüngül kənara əyilmiş formada doğulmağa başlayır */
             transform: translate(-50%, -50%) scale(0) rotateZ(-10deg);
             opacity: 0;
             pointer-events: none;
-            /* Sevimli, yumşaq "spring" sıçrayış effekti */
             transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease;
             z-index: 5;
             will-change: transform, opacity; 
@@ -263,7 +259,8 @@
             .card-symbol { width: 60px; height: 60px; margin-top: 10px; margin-bottom: 10px; }
             .card-title { font-size: 15px; }
             .roman-numeral { font-size: 16px; }
-            .card-back { padding: 15px 10px; }
+            /* DƏYİŞİKLİK: Mobil üçün də daxili boşluqlar artırıldı */
+            .card-back { padding: 22px 15px; } 
             .card-back p { font-size: 9.5px; line-height: 1.5; }
         }
     </style>
@@ -315,7 +312,7 @@
                         <div class="card-title">Yel</div>
                     </div>
                     <div class="card-face card-back">
-                        <p>Külək toxunulmazdır, onu görə bilməzsən, amma hər əsdiyində iliklərinə qədər hiss edərsən. Sevgi də yel kimidir, haradan, nə zaman gələcəyini bilməzsən. Bəzən incə bir meh kimi ruhuna toxunub sənə xoşbəxtlik gətirər, bəzən də tufan olub bütün dünyanı alt-üst edər. Yel çərşənbəsi qış yuxusundan oyanışın xəbərçisidir, uzaqlarda olanın qoxusunu sənə gətirər, ən gözəl hissləri ürəyinə çatdırar.</p>
+                        <p>Külək toxunulmazdır, onu görə bilməzsən, amma hər əsdiyində iliklərinə qədər hiss edərsən. Sevgi də yel kimidir; haradan, nə zaman gələcəyini bilməzsən. Bəzən incə bir meh kimi ruhuna toxunub sənə xoşbəxtlik gətirər, bəzən də tufan olub bütün dünyanı alt-üst edər. Yel çərşənbəsi qış yuxusundan oyanışın xəbərçisidir; uzaqlarda olanın qoxusunu sənə gətirər, ən gözəl hissləri ürəyinə çatdırar.</p>
                     </div>
                 </div>
             </div>
@@ -460,13 +457,14 @@
                 const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
                 const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 20; 
                 
-                let scaleValue = (window.innerHeight * 0.75) / rect.height;
+                /* DƏYİŞİKLİK: Mətnlər sığsın deyə scaleValue hesabı artırıldı (0.75 -> 0.85) */
+                let scaleValue = (window.innerHeight * 0.85) / rect.height;
                 if (window.innerWidth > 800) {
-                    if (scaleValue > 2.2) scaleValue = 2.2;
-                    if (scaleValue < 1.5) scaleValue = 1.5;
+                    if (scaleValue > 2.4) scaleValue = 2.4; 
+                    if (scaleValue < 1.6) scaleValue = 1.6; 
                 } else {
-                    if (scaleValue > 1.8) scaleValue = 1.8;
-                    if (scaleValue < 1.3) scaleValue = 1.3;
+                    if (scaleValue > 2.0) scaleValue = 2.0; 
+                    if (scaleValue < 1.4) scaleValue = 1.4; 
                 }
                 
                 wrapper.classList.add('active');
@@ -489,21 +487,18 @@
             }
         });
 
-        /* --- YENİ BİRLƏŞMƏ: Ardıcıllıq (Stagger) əlavə edildi --- */
         function toggleMerge() {
             isMerged = !isMerged;
             const container = document.querySelector('.cards-container');
             const containerRect = container.getBoundingClientRect();
-            // Kartlara şirin yelpik effekti üçün yüngül fırlanma dərəcələri
             const rotations = [-15, -5, 5, 15]; 
 
             if (isMerged) {
-                mergeBtn.innerHTML = '✧';
+                mergeBtn.innerHTML = 'Parçala ✧';
                 
                 const screenCenterX = window.innerWidth / 2;
                 const screenCenterY = window.innerHeight / 2;
                 
-                // Kartlar bir-birinin ardınca yığılır (stagger effekti)
                 standardCards.forEach((card, index) => {
                     setTimeout(() => {
                         const cardCenterX = containerRect.left + card.offsetLeft + card.offsetWidth / 2;
@@ -516,10 +511,9 @@
                         card.style.setProperty('--merge-y', `${moveY}px`);
                         card.style.setProperty('--merge-rot', `${rotations[index]}deg`);
                         card.classList.add('merged');
-                    }, index * 100); // Hər karta 100ms gecikmə
+                    }, index * 100); 
                 });
 
-                // Sonuncu kart yığıldıqdan sonra Novruz kartı şirin şəkildə peyda olur
                 setTimeout(() => {
                     novruzCard.classList.add('show');
                 }, 400 + (standardCards.length * 100)); 
@@ -528,7 +522,6 @@
                 mergeBtn.innerHTML = '✦';
                 novruzCard.classList.remove('show');
 
-                // Novruz kartı getdikdən sonra 4 kart ardıcıllıqla öz yerinə qayıdır
                 setTimeout(() => {
                     standardCards.forEach((card, index) => {
                         setTimeout(() => {
@@ -542,7 +535,6 @@
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
         const centerLine = screenW / 2;
-        // YENİ: Kəpənəklərin sayı telefonda 11, kompüterdə 25-dir
         const bugCount = isMobile ? 11 : 25; 
 
         for (let i = 0; i < bugCount; i++) { createMovingBug(); }
