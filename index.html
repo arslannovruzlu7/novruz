@@ -46,7 +46,8 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             transition: all 0.4s ease;
-            z-index: 200;
+            /* DƏYİŞİKLİK BURADADIR: z-index 200-dən 8-ə endirildi ki, kart açılanda arxada qalıb blurlansın */
+            z-index: 8; 
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
             outline: none;
         }
@@ -170,7 +171,6 @@
             will-change: transform; 
         }
         
-        /* --- YENİ BİRLƏŞMƏ: Çox şirin, yelpik kimi yığılma --- */
         .card-wrapper.merged {
             transform: translate(var(--merge-x), var(--merge-y)) scale(0.3) rotateZ(var(--merge-rot, 0deg));
             opacity: 0;
@@ -192,7 +192,7 @@
             transform: rotateY(180deg) translateZ(0); 
             justify-content: center; 
             align-items: center;
-            padding: 25px 20px; /* DƏYİŞİKLİK: Mətnin xəttin üstünə düşməməsi üçün padding artırıldı */
+            padding: 25px 20px; 
             text-align: center; 
             background: linear-gradient(145deg, #0b0e14, #1a2233); 
         }
@@ -259,7 +259,6 @@
             .card-symbol { width: 60px; height: 60px; margin-top: 10px; margin-bottom: 10px; }
             .card-title { font-size: 15px; }
             .roman-numeral { font-size: 16px; }
-            /* DƏYİŞİKLİK: Mobil üçün də daxili boşluqlar artırıldı */
             .card-back { padding: 22px 15px; } 
             .card-back p { font-size: 9.5px; line-height: 1.5; }
         }
@@ -286,7 +285,7 @@
                         <div class="card-title">Su</div>
                     </div>
                     <div class="card-face card-back">
-                        <p>Su həyatın başlanğıcı olduğu qədər, həm də ən saf sevginin rəmzidir. Necə ki su toxunduğu hər yeri yuyub təmizləyir, içimizə süzülən gerçək sevgi də qəlbdəki bütün kədəri yuyub aparır. İki ruhun bir-birinə qovuşması, iki damlanın eyni dənizdə axması kimidir, heç kim onları bir daha ayıra bilməz. Çünki su qədər şəffaf olan sevgi ruhu bulandırmaz, yalnız duruluq və həyat bəxş edər.</p>
+                        <p>Su həyatın başlanğıcı olduğu qədər, həm də ən saf sevginin rəmzidir. Dağlardan süzülüb gələn bulaq necə ki keçdiyi hər yeri yuyub təmizləyir, içimizə süzülən gerçək sevgi də qəlbdəki bütün kədəri yuyub aparır. İki ruhun bir-birinə qovuşması, iki damlanın eyni dənizdə yoxa çıxması kimidir; heç kim onları bir daha ayıra bilməz. Çünki su qədər şəffaf olan sevgi ruhu bulandırmaz, yalnız duruluq və həyat bəxş edər.</p>
                     </div>
                 </div>
             </div>
@@ -312,7 +311,7 @@
                         <div class="card-title">Yel</div>
                     </div>
                     <div class="card-face card-back">
-                        <p>Külək toxunulmazdır, onu görə bilməzsən, amma hər əsdiyində iliklərinə qədər hiss edərsən. Sevgi də yel kimidir; haradan, nə zaman gələcəyini bilməzsən. Bəzən incə bir meh kimi ruhuna toxunub sənə xoşbəxtlik gətirər, bəzən də tufan olub bütün dünyanı alt-üst edər. Yel çərşənbəsi qış yuxusundan oyanışın xəbərçisidir; uzaqlarda olanın qoxusunu sənə gətirər, ən gözəl hissləri ürəyinə çatdırar.</p>
+                        <p>Külək toxunulmazdır, onu görə bilməzsən, amma hər əsdiyində iliklərinə qədər hiss edərsən. Sevgi də yel kimidir, haradan, nə zaman gələcəyini bilməzsən. Bəzən incə bir meh kimi ruhuna toxunub sənə xoşbəxtlik gətirər, bəzən də tufan olub bütün dünyanı alt-üst edər. Yel çərşənbəsi qış yuxusundan oyanışın xəbərçisidir, uzaqlarda olanın qoxusunu sənə gətirər, ən gözəl hissləri ürəyinə çatdırar.</p>
                     </div>
                 </div>
             </div>
@@ -457,7 +456,6 @@
                 const centerX = window.innerWidth / 2 - (rect.left + rect.width / 2);
                 const centerY = window.innerHeight / 2 - (rect.top + rect.height / 2) - 20; 
                 
-                /* DƏYİŞİKLİK: Mətnlər sığsın deyə scaleValue hesabı artırıldı (0.75 -> 0.85) */
                 let scaleValue = (window.innerHeight * 0.85) / rect.height;
                 if (window.innerWidth > 800) {
                     if (scaleValue > 2.4) scaleValue = 2.4; 
@@ -494,7 +492,7 @@
             const rotations = [-15, -5, 5, 15]; 
 
             if (isMerged) {
-                mergeBtn.innerHTML = '✧';
+                mergeBtn.innerHTML = 'Parçala ✧';
                 
                 const screenCenterX = window.innerWidth / 2;
                 const screenCenterY = window.innerHeight / 2;
